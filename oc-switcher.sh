@@ -25,7 +25,7 @@ function usage {
     echo "usage: $0 <new_version>"
     get_current_version
     echo ""
-    get_OC_VERSIONS
+    get_oc_versions
     echo ""
     exit 1
 }
@@ -45,7 +45,7 @@ function get_current_version {
 }
 
 # get installed oc client versions
-function get_OC_VERSIONS {
+function get_oc_versions {
     echo "Found the following oc-client versions in ${OC_REPOSITORY}:"
     for OC_VERSION in $OC_VERSIONS; do
         OC_VERSION=${OC_VERSION/$OC_PREFIX}
@@ -63,7 +63,7 @@ function update_version {
     else
         echo "Version not available."
         echo ""
-        get_OC_VERSIONS
+        get_oc_versions
     fi
 }
 
