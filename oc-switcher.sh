@@ -7,13 +7,17 @@
 #                 $PATH location. 
 # author        : Andrei Gavriliu
 # date          : 2019-12-13
-# version       : 0.1
+# version       : 0.0.2
 # usage         : bash oc-switcher.sh <new_version>
 # ============================================================================================
 
 OC_REPOSITORY="$HOME/scripts"       # path where you store your oc clients (e.g.: $HOME/scripts)
 OC_PREFIX="openshift-oc-client-"    # how do we know how to find them (e.g: openshift-oc-client-)
 OC_PATH="/usr/local/bin"            # where do we create the symlink (must be in $PATH)
+
+YELLOW='\033[1;33m'
+GREEN='\033[1;32m'
+NOCOLOR='\033[0m'
 
 OC_NEW_VERSION=$1
 OC_VERSIONS=`ls ${OC_REPOSITORY} | grep ${OC_PREFIX} | sort -r`
@@ -23,6 +27,7 @@ OC_CHECK_TYPE=`type -t oc`
 # basic help mesage
 function usage {
     echo "usage: $0 <new_version>"
+    echo ""
     get_current_version
     echo ""
     get_oc_versions
@@ -34,7 +39,7 @@ function usage {
 function get_current_version {
     if [ $OC_CHECK_TYPE ]; then
         if [ $OC_CHECK_TYPE == "file" ]; then
-            echo "Currently running ${OC_CURRENT_VERSION}"
+            echo -e "Currently running ${GREEN}${OC_CURRENT_VERSION}${NOCOLOR}"
         fi
         if [ $OC_CHECK_TYPE == "alias" ]; then
             echo "Found an alias"
@@ -49,7 +54,8 @@ function get_oc_versions {
     echo "Found the following oc-client versions in ${OC_REPOSITORY}:"
     for OC_VERSION in $OC_VERSIONS; do
         OC_VERSION=${OC_VERSION/$OC_PREFIX}
-        echo "=> ${OC_VERSION}"
+        echo -n "=> "
+        echo -e "${YELLOW}${OC_VERSION}${NOCOLOR}"
     done
 }
 
@@ -57,7 +63,7 @@ function get_oc_versions {
 function update_version {
     OC_REPOSITORY_FILE=${OC_REPOSITORY}/${OC_PREFIX}${OC_NEW_VERSION}
     if [ -f "$OC_REPOSITORY_FILE" ]; then
-        echo -e "Adding version ${OC_NEW_VERSION}"
+        echo -n "Adding version ${OC_NEW_VERSION}"
         ln -sf "$OC_REPOSITORY_FILE" $OC_PATH/oc
         echo "... done"
     else
