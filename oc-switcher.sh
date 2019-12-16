@@ -17,6 +17,7 @@ OC_PATH="/usr/local/bin"            # where do we create the symlink (must be in
 
 YELLOW='\033[1;33m'
 GREEN='\033[1;32m'
+RED='\033[0;31m'
 NOCOLOR='\033[0m'
 
 OC_NEW_VERSION=$1
@@ -25,18 +26,18 @@ OC_CURRENT_VERSION=`readlink ${OC_PATH}/oc`
 OC_CHECK_TYPE=`type -t oc`
 
 # basic help mesage
-function usage {
+function _usage {
     echo "usage: $0 <new_version>"
     echo ""
-    get_current_version
+    _get_current_version
     echo ""
-    get_oc_versions
+    _get_oc_versions
     echo ""
     exit 1
 }
 
 # get current version
-function get_current_version {
+function _get_current_version {
     if [ $OC_CHECK_TYPE ]; then
         if [ $OC_CHECK_TYPE == "file" ]; then
             echo -e "Currently running ${GREEN}${OC_CURRENT_VERSION}${NOCOLOR}"
@@ -50,7 +51,7 @@ function get_current_version {
 }
 
 # get installed oc client versions
-function get_oc_versions {
+function _get_oc_versions {
     echo "Found the following oc-client versions in ${OC_REPOSITORY}:"
     for OC_VERSION in $OC_VERSIONS; do
         OC_VERSION=${OC_VERSION/$OC_PREFIX}
@@ -60,26 +61,27 @@ function get_oc_versions {
 }
 
 # add alias to bash profile
-function update_version {
+function _update_version {
     OC_REPOSITORY_FILE=${OC_REPOSITORY}/${OC_PREFIX}${OC_NEW_VERSION}
     if [ -f "$OC_REPOSITORY_FILE" ]; then
-        echo -n "Adding version ${OC_NEW_VERSION}"
+        echo -ne "Adding version ${YELLOW}${OC_NEW_VERSION}${NOCOLOR} "
         ln -sf "$OC_REPOSITORY_FILE" $OC_PATH/oc
-        echo "... done"
+        echo -e "....... ${GREEN}done${NOCOLOR}"
+        # enable_bash_completion
     else
         echo "Version not available."
         echo ""
-        get_oc_versions
+        _get_oc_versions
     fi
 }
 
 # update version
 if [ $OC_NEW_VERSION ]
 then
-    update_version $OC_NEW_VERSION
+    _update_version $OC_NEW_VERSION
 fi
 
 # show usage if no arguments provided
 if [ -z $1 ]; then
-    usage
+    _usage
 fi
