@@ -1,29 +1,47 @@
 #!/bin/bash
 
-# ============================================================================================
-# title         : oc-switcher.sh
-# description   : The following script helps manage multiple OpenShift oc client versions. It
-#                 creates a symlink of the oc client of your choice to a location within
-#                 $PATH location. 
-# author        : Andrei Gavriliu
-# date          : 2019-12-13
-# version       : 0.0.2
-# usage         : bash oc-switcher.sh <new_version>
-# ============================================================================================
+OC_SWITCHER_CONFIG="${HOME}/.oc-switcher"
 
-OC_REPOSITORY="$HOME/scripts"       # path where you store your oc clients (e.g.: $HOME/scripts)
-OC_PREFIX="openshift-oc-client-"    # how do we know how to find them (e.g: openshift-oc-client-)
-OC_PATH="/usr/local/bin"            # where do we create the symlink (must be in $PATH)
-
+# add some color
 YELLOW='\033[1;33m'
 GREEN='\033[1;32m'
 RED='\033[0;31m'
 NOCOLOR='\033[0m'
 
+# check if config file exists
+if ! test -f "${OC_SWITCHER_CONFIG}"; then
+    echo -e "${YELLOW}Warning:${NOCOLOR}"
+    echo -e "    Config file ${OC_SWITCHER_CONFIG} not found"
+    echo -en "    Creating a new one ... "
+    echo "OC_REPOSITORY=\"/usr/local/bin\" # path where you store your oc clients (e.g.: $HOME/scripts)" > ${OC_SWITCHER_CONFIG}
+    echo "OC_PREFIX=\"openshift-oc-client-\" # how do we know how to find them (e.g: openshift-oc-client-)" >> ${OC_SWITCHER_CONFIG}
+    echo "OC_PATH=\"/usr/local/bin\" # where do we create the symlink (must be somehwere in your PATH $PATH)" >> ${OC_SWITCHER_CONFIG}
+    echo -e "${GREEN}done${NOCOLOR}"
+    echo -e ""
+fi
+
+# source config
+source ${OC_SWITCHER_CONFIG}
+
+# commands
 OC_NEW_VERSION=$1
 OC_VERSIONS=`ls ${OC_REPOSITORY} | grep ${OC_PREFIX} | sort -r`
 OC_CURRENT_VERSION=`readlink ${OC_PATH}/oc`
 OC_CHECK_TYPE=`type -t oc`
+
+# check if config file contains required varilables
+if [ -z "$OC_REPOSITORY" ]; then
+    echo -e "${RED}ERROR:${NOCOLOR}"
+    echo -e "    OC_REPOSITORY variable is not set"
+fi
+if [ -z "$OC_PREFIX" ]; then
+    echo -e "${RED}ERROR:${NOCOLOR}"
+    echo -e "    OC_PREFIX variable is not set"
+fi
+if [ -z "$OC_PATH" ]; then
+    echo -e "${RED}ERROR:${NOCOLOR}"
+    echo -e "    OC_PATH variable is not set"
+fi
 
 # basic help mesage
 function _usage {
