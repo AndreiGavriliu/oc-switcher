@@ -45,7 +45,7 @@ source "${OC_SWITCHER_CONFIG}"
 
 # commands
 OC_NEW_VERSION=${1}
-OC_VERSIONS=$(find "${OC_REPOSITORY}" -maxdepth 1 -name "${OC_PREFIX}*" | awk -F/ '{print $NF}')
+OC_VERSIONS=$(find "${OC_REPOSITORY}" -maxdepth 1 -name "${OC_PREFIX}*" | awk -F/ '{print $NF}' | sort)
 OC_CURRENT_VERSION=$(readlink "${OC_PATH}/oc")
 OC_CHECK_TYPE=$(type -t oc)
 
